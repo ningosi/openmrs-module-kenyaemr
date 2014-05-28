@@ -94,6 +94,10 @@ kenyaemrApp.controller('ReportController', ['$scope', '$http', '$timeout', funct
 		ui.navigate('kenyaemr', 'reportExport', { appId: $scope.appId, request: requestId, type: type });
 	};
 
+	$scope.exportReportDataToDhis = function(requestId, type) {
+		ui.navigate('kenyaemr', 'reportExport', { appId: $scope.appId, request: requestId, type: type });
+	};
+
 	/**
 	 * Displays a dialog showing a request error
 	 * @param requestId the request id

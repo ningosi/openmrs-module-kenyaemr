@@ -78,12 +78,20 @@
 								<img src="${ ui.resourceLink("kenyaui", "images/glyphs/excel.png") }" class="ke-glyph" /> Excel
 							</a>
 							<% } %>
+
+							&nbsp;&nbsp;
+							<% if (dhisRenderable) { %>
+							<a href="#" ng-click="exportReportDataToDhis(request.id , 'dhis')">
+								<img src="${ ui.resourceLink("kenyaui", "images/glyphs/pdf.png") }" class="ke-glyph" /> Dhis
+							</a>
+							<% } %>
 						</div>
 						<div ng-if="request.status == 'FAILED'">
 							<a href="#" ng-click="viewReportError(request.id)">
 								<img src="${ ui.resourceLink("kenyaui", "images/glyphs/monitor.png") }" class="ke-glyph" /> Error
 							</a>
 						</div>
+
 					</td>
 				</tr>
 				<tr ng-if="finished.length == 0">

@@ -240,6 +240,7 @@
 		<property name="description" value="Monthly ART Drug Report" />
 		<property name="apps"><set><ref bean="kenyaemr.app.reports" /></set></property>
 		<property name="template" value="kenyaemr:artDrugs.xls" />
+		<property name="dhisTemplate" value="kenyaemr:dhis.xml" />
 	</bean>
 
 </beans>

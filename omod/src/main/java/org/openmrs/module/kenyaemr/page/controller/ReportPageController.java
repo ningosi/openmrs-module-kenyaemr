@@ -14,12 +14,6 @@
 
 package org.openmrs.module.kenyaemr.page.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.openmrs.module.kenyacore.CoreUtils;
 import org.openmrs.module.kenyacore.report.IndicatorReportDescriptor;
 import org.openmrs.module.kenyacore.report.ReportDescriptor;
@@ -37,6 +31,12 @@ import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.page.PageModel;
 import org.openmrs.ui.framework.page.PageRequest;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Report overview page
@@ -62,12 +62,14 @@ public class ReportPageController {
 
 		boolean isIndicator = report instanceof IndicatorReportDescriptor;
 		boolean excelRenderable = isIndicator && ((IndicatorReportDescriptor) report).getTemplate() != null;
+		boolean dhisRenderable = isIndicator && ((IndicatorReportDescriptor) report).getDhisTemplate() != null;
 
 		model.addAttribute("report", report);
 		model.addAttribute("definition", definition);
 		model.addAttribute("isIndicator", isIndicator);
 		model.addAttribute("excelRenderable", excelRenderable);
 		model.addAttribute("returnUrl", returnUrl);
+		model.addAttribute("dhisRenderable", dhisRenderable);
 
 		if (isIndicator) {
 			Map<String, String> startDateOptions = new LinkedHashMap<String, String>();

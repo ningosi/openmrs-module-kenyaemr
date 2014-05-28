@@ -22,6 +22,7 @@ import org.openmrs.module.kenyacore.report.IndicatorReportDescriptor;
 import org.openmrs.module.kenyacore.report.ReportDescriptor;
 import org.openmrs.module.kenyacore.report.ReportManager;
 import org.openmrs.module.kenyaemr.api.KenyaEmrService;
+import org.openmrs.module.kenyaemr.reporting.renderer.DhisReportRenderer;
 import org.openmrs.module.kenyaemr.reporting.renderer.MergedCsvReportRenderer;
 import org.openmrs.module.kenyaemr.wrapper.Facility;
 import org.openmrs.module.kenyaui.KenyaUiUtils;
@@ -59,6 +60,8 @@ public class ReportExportPageController {
 
 	private static final String EXPORT_TYPE_EXCEL = "excel";
 	private static final String EXPORT_TYPE_CSV = "csv";
+	private static final String EXPORT_TYPE_DHIS = "dhis";
+
 
 	/**
 	 * Exports report data as the given type
@@ -83,6 +86,10 @@ public class ReportExportPageController {
 		}
 		else if (EXPORT_TYPE_CSV.equals(type)) {
 			return renderAsCsv(report, reportData);
+		}
+
+		else if (EXPORT_TYPE_DHIS.equals(type)) {
+			return  renderAsDhis(report, reportData, resourceFactory);
 		}
 		else {
 			throw new RuntimeException("Unrecognised export type: " + type);
@@ -203,5 +210,62 @@ public class ReportExportPageController {
 
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM");
 		return definition.getName() + " " + df.format(date) + "." + extension;
+	}
+
+	/**
+	 * Renders an indicator report as CSV
+	 * @param report the report
+	 * @param data the evaluated report data
+	 * @return the file as a download
+	 * @throws IOException
+	 */
+	protected FileDownload renderAsDhis(ReportDescriptor report,
+										ReportData data,
+										ResourceFactory resourceFactory) throws IOException {
+		if (!(report instanceof IndicatorReportDescriptor)) {
+		throw new RuntimeException("Only indicator reports can be rendered as DHIS template");
+	}
+
+		ReportDefinition definition = report.getTarget();
+		UiResource dhisTemplate = ((IndicatorReportDescriptor) report).getDhisTemplate();
+
+		if (dhisTemplate == null || !dhisTemplate.getPath().endsWith(".xml")) {
+			throw new RuntimeException("Report doesn't specify a Dhis template");
+		}
+
+		// Load report template
+		byte[] dhisTemplateData = loadTemplateResource(resourceFactory, dhisTemplate);
+
+		DhisReportRenderer renderer;
+		{
+			// this is a bit of a hack, copied from ExcelRendererTest in the reporting module, to avoid
+			// needing to save the template and report design in the database
+			ReportDesignResource resource = new ReportDesignResource();
+			resource.setName("dhisTemplate.xml");
+			resource.setContents(dhisTemplateData);
+
+			final ReportDesign design = new ReportDesign();
+			design.setName(report.getName());
+			design.setReportDefinition(definition);
+			design.setRendererType(DhisReportRenderer.class);
+			design.addResource(resource);
+
+			renderer = new DhisReportRenderer() {
+				public ReportDesign getDesign(String argument) {
+					return design;
+				}
+			};
+		}
+
+		addExtraContextValues(data.getContext());
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		renderer.render(data, null, out);
+
+		return new FileDownload(
+				getDownloadFilename(definition, data.getContext(), "xml"),
+				ContentType.XML.getContentType(),
+				out.toByteArray()
+		);
 	}
 }
