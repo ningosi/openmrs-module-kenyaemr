@@ -15,6 +15,13 @@
 					active: (selection == "section-moh257"),
 					iconProvider: "kenyaui",
 					icon: "forms/moh257.png"
+			],
+			[
+					label: "Summaries",
+					href: ui.pageLink("kenyaemr", "chart/chartViewPatient", [ patientId: currentPatient.id, section: "summaries" ]),
+					active: (selection == "section-summaries"),
+					iconProvider: "kenyaui",
+					icon: "glyphs/summary.png"
 			]
 	];
 
@@ -101,6 +108,11 @@
 	<% } else if (section == "moh257") { %>
 
 		${ ui.includeFragment("kenyaemr", "moh257", [ patient: currentPatient ]) }
+
+	<% } else if (section == "summaries") { %>
+
+	    ${ ui.includeFragment("kenyaemr", "summaries/patientProfile", [ patient: currentPatient ]) }
+		${ ui.includeFragment("kenyaemr", "summaries/summaries", [ patient: currentPatient ]) }
 
 	<% } %>
 

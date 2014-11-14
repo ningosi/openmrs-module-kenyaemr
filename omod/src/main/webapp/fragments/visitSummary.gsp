@@ -21,11 +21,23 @@
 	<% if (visit.voided) { %>
 	<div class="ke-warning" style="margin-bottom: 5px">This visit has been voided</div>
 	<% } %>
-
-	${ ui.includeFragment("kenyaui", "widget/dataPoint", [ label: "Type", value: visit.visitType ]) }
-	${ ui.includeFragment("kenyaui", "widget/dataPoint", [ label: "Location", value: visit.location ]) }
-	${ ui.includeFragment("kenyaui", "widget/dataPoint", [ label: "When", value: kenyaui.formatVisitDates(visit) ]) }
-	${ ui.includeFragment("kenyaui", "widget/dataPoint", [ label: "Entry", value: sourceForm ?: "Registration" ]) }
+	<table width="90%">
+		<tr>
+			<td align="left">
+				${ ui.includeFragment("kenyaui", "widget/dataPoint", [ label: "Type", value: visit.visitType ]) }
+				${ ui.includeFragment("kenyaui", "widget/dataPoint", [ label: "Location", value: visit.location ]) }
+				${ ui.includeFragment("kenyaui", "widget/dataPoint", [ label: "When", value: kenyaui.formatVisitDates(visit) ]) }
+				${ ui.includeFragment("kenyaui", "widget/dataPoint", [ label: "Entry", value: sourceForm ?: "Registration" ]) }
+			</td>
+			<td valign="center">
+				<% if (visit) { %>
+					<button type="button" onclick="ke_deleteVisit(${ visit.id })">
+						<img src="${ ui.resourceLink("kenyaui", "images/glyphs/view.png") }" /> View visit summary
+					</button>
+				<% } %>
+			</td>
+		</tr>
+	</table>
 </div>
 
 <% if (allowVoid && !visit.voided) { %>
