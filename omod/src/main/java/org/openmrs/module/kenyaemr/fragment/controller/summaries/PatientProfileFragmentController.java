@@ -26,8 +26,8 @@ public class PatientProfileFragmentController {
 						   UiUtils ui) {
 		PatientIdentifierType pcn = MetadataUtils.existing(PatientIdentifierType.class, CommonMetadata._PatientIdentifierType.PATIENT_CLINIC_NUMBER);
 		PatientIdentifierType upn = MetadataUtils.existing(PatientIdentifierType.class, HivMetadata._PatientIdentifierType.UNIQUE_PATIENT_NUMBER);
-		List<PatientIdentifier> pcnIdentifiers = Context.getPatientService().getPatientIdentifiers(null, Arrays.asList(pcn), null, Arrays.asList(patient), false);
-		List<PatientIdentifier> upnIdentifiers = Context.getPatientService().getPatientIdentifiers(null, Arrays.asList(upn), null, Arrays.asList(patient), false);
+		List<PatientIdentifier> pcnIdentifiers = Context.getPatientService().getPatientIdentifiers(null, Arrays.asList(pcn), null, Arrays.asList(patient), null);
+		List<PatientIdentifier> upnIdentifiers = Context.getPatientService().getPatientIdentifiers(null, Arrays.asList(upn), null, Arrays.asList(patient), null);
 
 		String facility = Context.getService(KenyaEmrService.class).getDefaultLocation().getName();
 		String patient_clinic_number = "Not available";
