@@ -5,30 +5,35 @@
 			<tr>
 				<td>
 
-					<table>
+					<table width="50%">
 						<div class="ke-panel-frame">
 							<div class="ke-panel-heading">Patient Profile</div>
 							<tr>
-								<td>Facility Name</td>
-								<td>${ profile.facilityName }</td>
-								<td>Patient Clinic Number</td>
-								<td>${ profile.patientClinicNumber }</td>
+								<td>Facility Name: ${ profile.facilityName }</td>
+								<td>Patient Clinic Number: ${ profile.patientClinicNumber }</td>
 							</tr>
 							<tr>
-								<td>Unique Patient Number</td>
-								<td>${ profile.uniquePatientNumber }</td>
-								<td></td>
+								<td>Unique Patient Number:${ profile.uniquePatientNumber }</td>
+								<td>Patient's Names: ${ profile.names }</td>
+							</tr>
+							<tr>
+								<td>Sex ${ profile.gender }</td>
+								<td>Date of Birth: ${ profile.dob } Age: ${ profile.age }</td>
+							</tr>
+							<tr>
+								<td>Postal Address: ${ profile.address }</td>
+								<td>Tel Contact: ${ profile.tel }</td>
 							</tr>
 						</div>
 					</table>
 				</td>
-				<td>
+				<td valign="top">
 
 					<table>
 						<div class="ke-panel-frame">
 							<div class="ke-panel-heading">ARV THERAPY</div>
 							<tr>
-								<td></td>
+								<td>Date Medically Eligible  ${ profile.tel }</td>
 								<td></td>
 								<td></td>
 								<td></td>

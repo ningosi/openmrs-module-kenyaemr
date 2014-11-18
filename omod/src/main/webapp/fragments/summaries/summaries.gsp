@@ -22,5 +22,8 @@
 		<% } %>
 		<%}%>
 	</div>
+	<div>
+		All encounters are ${ allEncounters.size() }
+	</div>
 
 </div>
