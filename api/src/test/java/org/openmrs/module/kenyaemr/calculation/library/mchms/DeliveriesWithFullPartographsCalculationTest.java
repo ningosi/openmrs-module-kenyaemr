@@ -20,6 +20,7 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +58,7 @@ public class DeliveriesWithFullPartographsCalculationTest extends BaseModuleCont
 			 * save delivery form with partial partograph
 			 */
 			Patient patient = TestUtils.getPatient(7);
-			Date encounterDate =  TestUtils.date(2014, 7, 20);
+			Date encounterDate =  dateWithinTestingPeriod();//TestUtils.date(2014, 7, 20);
 			Obs[] deliveryObs = {
 					TestUtils.saveObs(patient, Dictionary.getConcept(Metadata.Concept.PREGNANCY_DURATION_AMOUNT), 6, encounterDate),
 					TestUtils.saveObs(patient, Dictionary.getConcept(Metadata.Concept.METHOD_OF_DELIVERY), Dictionary.getConcept(Metadata.Concept.OTHER_NON_CODED) , encounterDate),
@@ -69,15 +70,17 @@ public class DeliveriesWithFullPartographsCalculationTest extends BaseModuleCont
 					TestUtils.saveObs(patient, Dictionary.getConcept(Metadata.Concept.APGAR_SCORE_AT_10_MINUTES), 5, encounterDate)
 			};
 
-			TestUtils.saveEncounter(patient, ancEncounterType, deliveryForm, TestUtils.date(2014, 7, 20), deliveryObs);
+			TestUtils.saveEncounter(patient, ancEncounterType, deliveryForm, dateWithinTestingPeriod(), deliveryObs);
 		}
 
 		{
 			/**
 			 * add full partograph
 			 */
+
+
 			Patient patient = TestUtils.getPatient(8);
-			Date encounterDate =  TestUtils.date(2014, 7, 20);
+			Date encounterDate = dateWithinTestingPeriod();//TestUtils.date(2014, 7, 20);
 			Obs[] deliveryObs = {
 					TestUtils.saveObs(patient, Dictionary.getConcept(Metadata.Concept.PREGNANCY_DURATION_AMOUNT), 6, encounterDate),
 					TestUtils.saveObs(patient, Dictionary.getConcept(Metadata.Concept.METHOD_OF_DELIVERY), Dictionary.getConcept(Metadata.Concept.OTHER_NON_CODED) , encounterDate),
@@ -92,7 +95,7 @@ public class DeliveriesWithFullPartographsCalculationTest extends BaseModuleCont
 					TestUtils.saveObs(patient, Dictionary.getConcept(Metadata.Concept.DELIVERY_ASSISTANT), Dictionary.getConcept(Metadata.Concept.FAMILY_MEMBER), encounterDate)
 			};
 
-			TestUtils.saveEncounter(patient, ancEncounterType, deliveryForm, TestUtils.date(2014, 7, 20), deliveryObs);
+			TestUtils.saveEncounter(patient, ancEncounterType, deliveryForm, dateWithinTestingPeriod(), deliveryObs);
 
 		}
 
@@ -113,5 +116,10 @@ public class DeliveriesWithFullPartographsCalculationTest extends BaseModuleCont
 		Obs obs = new Obs(patient, concept, date, null);
 		obs.setValueText(val);
 		return Context.getObsService().saveObs(obs, null);
+	}
+	private Date dateWithinTestingPeriod(){
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, -4);
+		return cal.getTime();
 	}
 }
