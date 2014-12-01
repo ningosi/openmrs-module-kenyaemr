@@ -29,7 +29,6 @@ import org.openmrs.module.kenyaemr.regimen.RegimenOrder;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.ui.framework.SimpleObject;
 import org.openmrs.ui.framework.UiUtils;
-import org.openmrs.ui.framework.fragment.FragmentActionUiUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
@@ -43,7 +42,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  * Tests for {@link EmrUiUtils}
@@ -68,7 +71,7 @@ public class EmrUiUtilsTest extends BaseModuleContextSensitiveTest {
 		InputStream stream = getClass().getClassLoader().getResourceAsStream("test-regimens.xml");
 		regimenManager.loadDefinitionsFromXML(stream);
 
-		this.ui = new FragmentActionUiUtils(null, null, null);
+		//this.ui = new FragmentActionUiUtils(null, null, null);
 
 		DrugOrder dapsone = new DrugOrder();
 		dapsone.setConcept(Dictionary.getConcept(Dictionary.DAPSONE));
