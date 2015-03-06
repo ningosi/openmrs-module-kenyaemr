@@ -68,7 +68,7 @@ public class EmrUiUtilsTest extends BaseModuleContextSensitiveTest {
 		InputStream stream = getClass().getClassLoader().getResourceAsStream("test-regimens.xml");
 		regimenManager.loadDefinitionsFromXML(stream);
 
-		this.ui = new FragmentActionUiUtils(null, null, null);
+		this.ui = new FragmentActionUiUtils(null, null, null, null);
 
 		DrugOrder dapsone = new DrugOrder();
 		dapsone.setConcept(Dictionary.getConcept(Dictionary.DAPSONE));

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "openconceptlab",
+    "description": "openconceptlab.app.description",
+    "icon": "kenyaui:apps/concepts.png",
+    "url": "openconceptlab/status.page",
+    "label":"Open Concept Lab ",
+    "order": 900
+  }
+]
