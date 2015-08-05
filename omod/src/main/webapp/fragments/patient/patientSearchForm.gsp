@@ -19,4 +19,8 @@
 	<span class="ke-field-content">
 		<input type="text" name="query" ng-model="query" ng-change="updateSearch()" style="width: 260px" />
 	</span>
+	<label class="ke-field-label">Age</label>
+	<span class="ke-field-content">
+		<input type="text" name="age" ng-model="age" ng-change="updateSearch()"  style="width: 100px" />
+	</span>
 </form>

@@ -20,8 +20,8 @@ kenyaemrApp.service('PatientService', function ($rootScope) {
 	/**
 	 * Broadcasts new patient search parameters
 	 */
-	this.updateSearch = function(query, which) {
-		$rootScope.$broadcast('patient-search', { query: query, which: which });
+	this.updateSearch = function(query, which, age) {
+		$rootScope.$broadcast('patient-search', { query: query, which: which, age: age });
 	};
 });
 
@@ -31,6 +31,7 @@ kenyaemrApp.service('PatientService', function ($rootScope) {
 kenyaemrApp.controller('PatientSearchForm', ['$scope', 'PatientService', function($scope, patientService) {
 
 	$scope.query = '';
+	$scope.age = '';
 
 	$scope.init = function(which) {
 		$scope.which = which;
@@ -38,7 +39,7 @@ kenyaemrApp.controller('PatientSearchForm', ['$scope', 'PatientService', functio
 	};
 
 	$scope.updateSearch = function() {
-		patientService.updateSearch($scope.query, $scope.which);
+		patientService.updateSearch($scope.query, $scope.which, $scope.age);
 	};
 }]);
 
@@ -49,6 +50,7 @@ kenyaemrApp.controller('PatientSearchResults', ['$scope', '$http', function($sco
 
 	$scope.query = '';
 	$scope.results = [];
+	$scope.age = ''
 
 	/**
 	 * Initializes the controller
@@ -67,6 +69,7 @@ kenyaemrApp.controller('PatientSearchResults', ['$scope', '$http', function($sco
 	$scope.$on('patient-search', function(event, data) {
 		$scope.query = data.query;
 		$scope.which = data.which;
+		$scope.age = data.age;
 		$scope.refresh();
 	});
 
@@ -74,7 +77,7 @@ kenyaemrApp.controller('PatientSearchResults', ['$scope', '$http', function($sco
 	 * Refreshes the person search
 	 */
 	$scope.refresh = function() {
-		$http.get(ui.fragmentActionLink('kenyaemr', 'search', 'patients', { appId: $scope.appId, q: $scope.query, which: $scope.which })).
+		$http.get(ui.fragmentActionLink('kenyaemr', 'search', 'patients', { appId: $scope.appId, q: $scope.query, which: $scope.which, age: $scope.age})).
 			success(function(data) {
 				$scope.results = data;
 			});

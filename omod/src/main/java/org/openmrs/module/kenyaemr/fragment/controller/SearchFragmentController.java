@@ -82,6 +82,8 @@ public class SearchFragmentController {
 	 */
 	public List<SimpleObject> patients(@RequestParam(value = "q", required = false) String query,
 									   @RequestParam(value = "which", required = false, defaultValue = "all") String which,
+									   @RequestParam(value = "age", required = false) Integer age,
+									   @RequestParam(value = "ageWindow", defaultValue = "10") int ageWindow,
 									   UiUtils ui) {
 
 		// Return empty list if we don't have enough input to search on
@@ -91,7 +93,16 @@ public class SearchFragmentController {
 
 		// Run main patient search query based on id/name
 		List<Patient> matchedByNameOrID = Context.getPatientService().getPatients(query);
+		if (age != null) {
 
+			List<Patient> similar = new ArrayList<Patient>();
+			for (Patient p : matchedByNameOrID) {
+				if ((p.getAge() - age) >= 0 && (p.getAge() - age) <= ageWindow) {
+					similar.add(p);
+				}
+			}
+			matchedByNameOrID = similar;
+		}
 		// Gather up active visits for all patients. These are attached to the returned patient representations.
 		Map<Patient, Visit> patientActiveVisits = getActiveVisitsByPatients();
 
