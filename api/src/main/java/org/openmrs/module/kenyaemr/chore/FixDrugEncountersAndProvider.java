@@ -18,9 +18,12 @@ import org.openmrs.module.metadatadeploy.MetadataUtils;
 import org.springframework.stereotype.Component;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -41,15 +44,26 @@ public class FixDrugEncountersAndProvider extends AbstractChore {
         ProviderService providerService = Context.getProviderService();
 
         List<Patient> allPatients = Context.getPatientService().getAllPatients();
+        Set<Patient> requiredPatients = new HashSet<Patient>();
         Set<Encounter> encountersForPatient = new HashSet<Encounter>();
-        for(Patient patient: allPatients){
-            List<DrugOrder> patientDrugorder = orderService.getDrugOrdersByPatient(patient);
-            //loop through for every drug order and have a set of dates
-            Set<Date> uniqueDrugOrderSet = new HashSet<Date>();
-            for(DrugOrder drugOrder:patientDrugorder){
-              uniqueDrugOrderSet.add(drugOrder.getStartDate());
+        Map<Patient, List<DrugOrder>> patientDrugPair = new HashMap<Patient, List<DrugOrder>>();
+        for(Patient patient: allPatients) {
+            patientDrugPair.put(patient, orderService.getDrugOrdersByPatient(patient);
+        }
+        //loop through for every drug order and have a set of dates
+        Set<Date> uniqueDrugOrderSet = new HashSet<Date>();
+        if(patientDrugPair.size() > 0) {
+            for (Map.Entry<Patient, List<DrugOrder>> info : patientDrugPair.entrySet()) {
+                if (info.getValue().size() == 0) {
+                    patientDrugPair.remove(info);
+                }
             }
+            requiredPatients.addAll(patientDrugPair.keySet());
+        }
+        System.out.println("Only :::"+requiredPatients.size()+" Patients have drug orders");
+        for(Patient setPatient:requiredPatients){
             //create encounters based on the dates in the set for this patient
+
             if(uniqueDrugOrderSet.size() > 0){
                 for(Date encounterDate: uniqueDrugOrderSet){
                     Encounter drugEncounter = new Encounter();
@@ -59,7 +73,7 @@ public class FixDrugEncountersAndProvider extends AbstractChore {
                     drugEncounter.setEncounterDatetime(encounterDate);
                     drugEncounter.setProvider(role,provider);
                     drugEncounter.setEncounterType(MetadataUtils.existing(EncounterType.class, HivMetadata._EncounterType.HIV_CONSULTATION));
-                    drugEncounter.setPatient(patient);
+                    drugEncounter.setPatient(setPatient);
                     drugEncounter.setLocation(Context.getService(KenyaEmrService.class).getDefaultLocation());
                     drugEncounter.setCreator(Context.getAuthenticatedUser());
                     drugEncounter.setDateCreated(new Date());
@@ -78,7 +92,7 @@ public class FixDrugEncountersAndProvider extends AbstractChore {
 
                 }
             }
-            out.println("Patient "+patient.getPatientId()+" has "+encountersForPatient.size()+" drug encounters added");
+            out.println("Patient "+setPatient.getPatientId()+" has "+encountersForPatient.size()+" drug encounters added");
         }
 
     }
