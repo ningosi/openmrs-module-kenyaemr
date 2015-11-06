@@ -20,11 +20,11 @@ import org.springframework.stereotype.Component;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Created by codehub on 11/6/15.
@@ -46,12 +46,12 @@ public class FixDrugEncountersAndProvider extends AbstractChore {
         List<Patient> allPatients = Context.getPatientService().getAllPatients();
         Set<Patient> requiredPatients = new HashSet<Patient>();
         Set<Encounter> encountersForPatient = new HashSet<Encounter>();
-        Map<Patient, List<DrugOrder>> patientDrugPair = new HashMap<Patient, List<DrugOrder>>();
+        TreeMap<Patient, List<DrugOrder>> patientDrugPair = new TreeMap<Patient, List<DrugOrder>>();
+        List<DrugOrder> requiredPatientDrugOrders = new ArrayList<DrugOrder>();
         for(Patient patient: allPatients) {
-            patientDrugPair.put(patient, orderService.getDrugOrdersByPatient(patient);
+            patientDrugPair.put(patient, orderService.getDrugOrdersByPatient(patient));
         }
         //loop through for every drug order and have a set of dates
-        Set<Date> uniqueDrugOrderSet = new HashSet<Date>();
         if(patientDrugPair.size() > 0) {
             for (Map.Entry<Patient, List<DrugOrder>> info : patientDrugPair.entrySet()) {
                 if (info.getValue().size() == 0) {
@@ -61,9 +61,13 @@ public class FixDrugEncountersAndProvider extends AbstractChore {
             requiredPatients.addAll(patientDrugPair.keySet());
         }
         System.out.println("Only :::"+requiredPatients.size()+" Patients have drug orders");
-        for(Patient setPatient:requiredPatients){
+        Set<Date> uniqueDrugOrderSet = new HashSet<Date>();
+        for(Patient setPatient:requiredPatients) {
             //create encounters based on the dates in the set for this patient
-
+            requiredPatientDrugOrders.addAll(orderService.getDrugOrdersByPatient(setPatient));
+            for(DrugOrder order: requiredPatientDrugOrders){
+                uniqueDrugOrderSet.add(order.getStartDate());
+            }
             if(uniqueDrugOrderSet.size() > 0){
                 for(Date encounterDate: uniqueDrugOrderSet){
                     Encounter drugEncounter = new Encounter();
@@ -83,10 +87,11 @@ public class FixDrugEncountersAndProvider extends AbstractChore {
                     encountersForPatient.add(drugEncounter);
                     //the same encounter needs to be set where drug orders have the same date as the encounter
 
-                    for(DrugOrder drugOrder:patientDrugorder){
+                    for(DrugOrder drugOrder:requiredPatientDrugOrders){
                         if(drugOrder.getStartDate().equals(drugEncounter.getEncounterDatetime())){
                             drugOrder.setEncounter(drugEncounter);
                             drugOrder.setOrderer(Context.getAuthenticatedUser());
+                            orderService.saveOrder(drugOrder);
                         }
                     }
 
