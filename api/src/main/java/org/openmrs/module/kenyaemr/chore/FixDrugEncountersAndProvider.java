@@ -4,16 +4,10 @@ import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.EncounterType;
 import org.openmrs.Patient;
+import org.openmrs.api.EncounterService;
 import org.openmrs.api.OrderService;
 import org.openmrs.api.context.Context;
-import org.openmrs.calculation.patient.PatientCalculationContext;
-import org.openmrs.calculation.patient.PatientCalculationService;
-import org.openmrs.calculation.result.CalculationResultMap;
-import org.openmrs.calculation.result.ListResult;
-import org.openmrs.module.kenyacore.calculation.CalculationUtils;
-import org.openmrs.module.kenyacore.calculation.Calculations;
 import org.openmrs.module.kenyacore.chore.AbstractChore;
-import org.openmrs.module.kenyaemr.calculation.EmrCalculationUtils;
 import org.openmrs.module.kenyaemr.metadata.CommonMetadata;
 import org.openmrs.module.kenyaemr.metadata.HivMetadata;
 import org.openmrs.module.metadatadeploy.MetadataUtils;
@@ -40,56 +34,59 @@ public class FixDrugEncountersAndProvider extends AbstractChore {
 
     void patientDrugOrders(PrintWriter out){
         OrderService orderService = Context.getOrderService();
-        PatientCalculationContext context = Context.getService(PatientCalculationService.class).createCalculationContext();
         List<Patient> allPatients = Context.getPatientService().getAllPatients();
         List<DrugOrder> requiredPatientDrugOrders = new ArrayList<DrugOrder>();
         int count = 0;
         for(Patient patient: allPatients) {
 
-            requiredPatientDrugOrders.addAll(orderService.getDrugOrdersByPatient(patient));
-            for(DrugOrder drugOrder:requiredPatientDrugOrders){
-                Encounter encounter = drugEncounter(drugOrder.getStartDate(), drugOrder.getPatient(), context);
-                if(drugOrder.getEncounter() == null && encounter != null){
-                    drugOrder.setEncounter(encounter);
-                    drugOrder.setOrderer(encounter.getCreator());
-                    orderService.saveOrder(drugOrder);
-                    count++;
+            requiredPatientDrugOrders.addAll(orderService.getDrugOrdersByPatient(patient, OrderService.ORDER_STATUS.ANY, true));
+            if(requiredPatientDrugOrders.size() > 0) {
+                for (DrugOrder drugOrder : requiredPatientDrugOrders) {
+                    Encounter encounter = drugEncounter(drugOrder.getStartDate(), drugOrder.getPatient());
+                    if (drugOrder.getEncounter() == null && encounter != null) {
+                        drugOrder.setEncounter(encounter);
+                        drugOrder.setOrderer(encounter.getCreator());
+                        orderService.saveOrder(drugOrder);
+                        count++;
+                    }
+
                 }
+
             }
         }
-        out.println(count+" drug orders fixed");
+        out.println("Fixed "+count+" drug orders");
+
 
     }
 
 
-    Encounter drugEncounter(Date date, Patient patient, PatientCalculationContext context){
+    Encounter drugEncounter(Date date, Patient patient){
         Encounter encounter =  null;
+        EncounterService encounterService = Context.getEncounterService();
         EncounterType hivConsultation = MetadataUtils.existing(EncounterType.class, HivMetadata._EncounterType.HIV_CONSULTATION);
         EncounterType hivEnrollment = MetadataUtils.existing(EncounterType.class, HivMetadata._EncounterType.HIV_ENROLLMENT);
         EncounterType hivRegistration = MetadataUtils.existing(EncounterType.class, CommonMetadata._EncounterType.REGISTRATION);
-        CalculationResultMap consultationEncounters = Calculations.allEncounters(hivConsultation, Arrays.asList(patient.getPatientId()), context);
-        ListResult consultationEncountersListResults = (ListResult) consultationEncounters.get(patient.getPatientId());
-        List<Encounter> consultationEncountersList = CalculationUtils.extractResultValues(consultationEncountersListResults);
 
-        CalculationResultMap hivEnrollmentEncounterMap = Calculations.lastEncounter(hivEnrollment, Arrays.asList(patient.getPatientId()), context);
-        Encounter hivEnrollmentEncounter = EmrCalculationUtils.encounterResultForPatient(hivEnrollmentEncounterMap, patient.getPatientId());
 
-        CalculationResultMap hivRegistrationEncounterMap = Calculations.lastEncounter(hivRegistration, Arrays.asList(patient.getPatientId()), context);
-        Encounter  hivRegistrationEncounter = EmrCalculationUtils.encounterResultForPatient(hivRegistrationEncounterMap, patient.getPatientId());
-        for(Encounter encounter1:consultationEncountersList){
+        List<Encounter> encounterList = encounterService.getEncounters(patient, null, null, date, null, Arrays.asList(hivConsultation), null,null,null, false);
+        List<Encounter> hivEnrollmentEncounter = encounterService.getEncounters(patient, null, null, date, null, Arrays.asList(hivEnrollment), null,null,null, false);
+        List<Encounter> hivRegistrationEncounter = encounterService.getEncounters(patient, null, null, date, null, Arrays.asList(hivRegistration), null,null,null, false);
+
+        for(Encounter encounter1:encounterList){
             if(DateUtil.getStartOfDay(date).equals(DateUtil.getStartOfDay(encounter1.getEncounterDatetime()))){
                 encounter = encounter1;
                 break;
             }
+
         }
-        if(encounter == null && consultationEncountersList.size() > 0){
-            encounter = consultationEncountersList.get(0);
+        if(encounter == null && encounterList.size() > 0){
+            encounter = encounterList.get(0);
         }
-        else if(encounter == null && hivEnrollmentEncounter != null){
-            encounter = hivEnrollmentEncounter;
+        else if(encounter == null && hivEnrollmentEncounter.size() > 0){
+            encounter = hivEnrollmentEncounter.get(0);
         }
-        else if(encounter == null && hivRegistrationEncounter != null){
-            encounter = hivRegistrationEncounter;
+        else if(encounter == null && hivRegistrationEncounter.size() > 0){
+            encounter = hivRegistrationEncounter.get(0);
         }
         return encounter;
 
