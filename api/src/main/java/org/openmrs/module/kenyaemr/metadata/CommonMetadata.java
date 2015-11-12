@@ -108,6 +108,8 @@ public class CommonMetadata extends AbstractMetadataBundle {
 		install(globalProperty(EmrConstants.GP_DEFAULT_LOCATION, "The facility for which this installation is configured",
 				LocationDatatype.class, null, null));
 
+		install(globalProperty(EmrConstants.OREDER_DRUG_DOSING_UNITS_CONCEPT_UUID_NAME, "The concept set where its members represent the possible drug dosing units", EmrConstants.OREDER_DRUG_DOSING_UNITS_CONCEPT_UUID));
+
 		install(patientIdentifierType("Old Identification Number", "Identifier given out prior to OpenMRS",
 				null, null, null,
 				LocationBehavior.NOT_USED, false, _PatientIdentifierType.OLD_ID));

@@ -52,4 +52,6 @@ public class EmrConstants {
 	public static final String DEFAULT_SUPPORT_PHONE_NUMBER = "0800720701";
 	public static final String DEFAULT_SUPPORT_EMAIL_ADDRESS = "help@kenyaemr.org";
 	public static final String DEFAULT_EXTERNAL_HELP_URL = "/help";
+	public static final String OREDER_DRUG_DOSING_UNITS_CONCEPT_UUID_NAME = "order.drugDosingUnitsConceptUuid";
+	public static final String OREDER_DRUG_DOSING_UNITS_CONCEPT_UUID = "162384AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 }
